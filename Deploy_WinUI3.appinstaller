@@ -1,40 +1,55 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<AppInstaller
-	Uri="file:///C:/Users/topki/OneDrive/Documents/Lập trình Window/Deploy_WinUI3 (Package).appinstaller"
-	Version="1.0.0.0" xmlns="http://schemas.microsoft.com/appx/appinstaller/2017/2">
-	<MainBundle
-		Name="b6e92e18-59a5-433b-b3a3-2f14c1827cb3"
-		Version="1.0.0.0"
-		Publisher="CN=topki"
-		Uri="file:///C:/Users/topki/OneDrive/Documents/Lập trình Window/Deploy_WinUI3 (Package)_1.0.0.0_Test/Deploy_WinUI3 (Package)_1.0.0.0_x86_x64.msixbundle" />
-	<Dependencies>
-		<Package
-			Name="Microsoft.WindowsAppRuntime.1.8"
-			Publisher="CN=Microsoft Corporation, O=Microsoft Corporation, L=Redmond, S=Washington, C=US"
-			ProcessorArchitecture="x86"
-			Uri="file:///C:/Users/topki/OneDrive/Documents/Lập trình Window/Deploy_WinUI3 (Package)_1.0.0.0_Test/Dependencies/x86/Microsoft.WindowsAppRuntime.1.8.msix"
-			Version="8000.731.1532.0" />
-		<Package
-			Name="Microsoft.WindowsAppRuntime.1.8"
-			Publisher="CN=Microsoft Corporation, O=Microsoft Corporation, L=Redmond, S=Washington, C=US"
-			ProcessorArchitecture="x64"
-			Uri="file:///C:/Users/topki/OneDrive/Documents/Lập trình Window/Deploy_WinUI3 (Package)_1.0.0.0_Test/Dependencies/x64/Microsoft.WindowsAppRuntime.1.8.msix"
-			Version="8000.731.1532.0" />
-		<Package
-			Name="Microsoft.VCLibs.140.00.UWPDesktop"
-			Publisher="CN=Microsoft Corporation, O=Microsoft Corporation, L=Redmond, S=Washington, C=US"
-			ProcessorArchitecture="x64"
-			Uri="file:///C:/Users/topki/OneDrive/Documents/Lập trình Window/Deploy_WinUI3 (Package)_1.0.0.0_Test/Dependencies/x64/Microsoft.VCLibs.x64.14.00.Desktop.appx"
-			Version="14.0.33728.0" />
-		<Package
-			Name="Microsoft.VCLibs.140.00.UWPDesktop"
-			Publisher="CN=Microsoft Corporation, O=Microsoft Corporation, L=Redmond, S=Washington, C=US"
-			ProcessorArchitecture="x86"
-			Uri="file:///C:/Users/topki/OneDrive/Documents/Lập trình Window/Deploy_WinUI3 (Package)_1.0.0.0_Test/Dependencies/x86/Microsoft.VCLibs.x86.14.00.Desktop.appx"
-			Version="14.0.33728.0" />
-	</Dependencies>
-	<UpdateSettings>
-		<OnLaunch
-			HoursBetweenUpdateChecks="0" />
-	</UpdateSettings>
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Sample .appinstaller file for self-hosted MSIX updates.
+  Replace placeholder values (Publisher, Name, Version, Uri, Resource URIs) with real values.
+  Host this file and the referenced MSIX on HTTPS.
+-->
+<AppInstaller xmlns="http://schemas.microsoft.com/appx/appinstaller/2018"
+              Version="1.0.0.0"
+              Uri="https://kozkhoa.github.io/deploy_winui3/Deploy_WinUI3.appinstaller">
+
+  <!-- The main package that will be installed/updated -->
+  <MainPackage
+    Name="YourCompany.YourApp"
+    Publisher="CN=YourPublisherCommonName"
+    Version="1.0.0.0"
+    Uri="https://kozkhoa.github.io/deploy_winui3/Deploy_WinUI3_1.0.0.0_x86_x64.msixbundle" />
+
+  <!-- Optional dependencies (frameworks, runtime packages) -->
+  <Dependencies>
+    <!--
+      Example dependency entry. Only include if your app has framework packages.
+      <Package Name="Microsoft.VCLibs.140.00" Publisher="CN=Microsoft Windows" Version="14.0.30704.0" Uri="https://example.com/packages/Microsoft.VCLibs.140.00.appx" />
+    -->
+  </Dependencies>
+
+  <!-- Optional resource files (PRI) for specific languages or resources -->
+  <Resources>
+    <!-- <Resource Language="en-US" Uri="https://example.com/resources/Resources.en-US.pri" /> -->
+  </Resources>
+
+  <!--
+    UpdateSettings controls how the App Installer checks for updates.
+    - OnLaunch: check when app is launched. HoursBetweenUpdateChecks="0" means check every launch.
+    - AutomaticBackgroundTask: run periodic background checks (requires App Installer support on client).
+    - UpdateBlocksActivation="true" prevents activation while update is pending (use with care).
+    - ForceUpdateFrom can be used to force update from a specific version range.
+  -->
+  <UpdateSettings>
+    <!-- Check for updates on app launch. Set HoursBetweenUpdateChecks to 0 to check on every launch. -->
+    <OnLaunch HoursBetweenUpdateChecks="24" UpdateBlocksActivation="false" />
+
+    <!-- Enable background update checks every 24 hours. Set Enabled="false" to disable. -->
+    <AutomaticBackgroundTask Enabled="true" HoursBetweenUpdateChecks="24" />
+
+    <!-- When to show install prompt: "always", "silent" or omitted. Use "always" to always prompt user. -->
+    <ShowPrompt>always</ShowPrompt>
+
+    <!-- Example: force update from a previous version if needed. Uncomment and adjust if required. -->
+    <!-- <ForceUpdateFrom>1.0.0.0</ForceUpdateFrom> -->
+  </UpdateSettings>
+
+  <!-- If true, installer attempts to download and install all resource packages listed above. -->
+  <InstallAllResources>false</InstallAllResources>
+
 </AppInstaller>
