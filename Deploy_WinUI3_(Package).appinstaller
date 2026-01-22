@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <AppInstaller
-	Uri="https://kozkhoa.github.io/deploy_winui3/Deploy_WinUI3 (Package).appinstaller"
+	Uri="https://kozkhoa.github.io/deploy_winui3/Deploy_WinUI3_(Package).appinstaller"
 	Version="1.0.0.0" xmlns="http://schemas.microsoft.com/appx/appinstaller/2017/2">
 	<MainBundle
 		Name="b6e92e18-59a5-433b-b3a3-2f14c1827cb3"
