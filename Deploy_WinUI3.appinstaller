@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <!--
   Sample .appinstaller file for self-hosted MSIX updates.
   Replace placeholder values (Publisher, Name, Version, Uri, Resource URIs) with real values.
@@ -6,14 +6,14 @@
 -->
 <AppInstaller xmlns="http://schemas.microsoft.com/appx/appinstaller/2017"
               Version="1.0.0.0"
-              Uri="https://kozkhoa.github.io/deploy_winui3/DeployWinUI3.appinstaller">
+              Uri="https://kozkhoa.github.io/deploy_winui3/Deploy_WinUI3.appinstaller">
 
   <!-- The main package that will be installed/updated -->
   <MainPackage
     Name="Deploy_WinUI3"
     Publisher="CN=KozKhoa"
     Version="1.0.0.0"
-    Uri="https://kozkhoa.github.io/deploy_winui3/Deploy_WinUI3_(Package)_1.0.0.0_x86_x64.msixbundle" />
+    Uri="https://kozkhoa.github.io/deploy_winui3/Deploy_WinUI3_1.0.0.0_x86_x64.msixbundle" />
 
   <!-- Optional dependencies (frameworks, runtime packages) -->
   <Dependencies>
