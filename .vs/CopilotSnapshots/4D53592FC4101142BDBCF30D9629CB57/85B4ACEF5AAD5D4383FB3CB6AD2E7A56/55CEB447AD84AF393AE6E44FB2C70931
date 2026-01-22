@@ -1,0 +1,208 @@
+﻿using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
+using System;
+using System.IO;
+using System.Net.Http;
+using System.Threading.Tasks;
+using System.Xml.Linq;
+
+// To learn more about WinUI, the WinUI project structure,
+// and more about our project templates, see: http://aka.ms/winui-project-info.
+
+namespace Deploy_WinUI3
+{
+    /// <summary>
+    /// An empty window that can be used on its own or navigated to within a Frame.
+    /// </summary>
+    public sealed partial class MainWindow : Window
+    {
+        // URL to your hosted .appinstaller file (HTTPS). Replace before production.
+        private const string AppInstallerFileUrl = "https://kozkhoa.github.io/deploy_winui3/Deploy_WinUI3%20(Package).appinstaller";
+
+        // HttpClient instance for update checks
+        private static readonly HttpClient s_httpClient = new HttpClient();
+
+        public MainWindow()
+        {
+            InitializeComponent();
+
+            // Start update check in background (fire-and-forget)
+            _ = CheckForUpdatesAsync();
+        }
+
+        private void OnShowVersion(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                var version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "(unknown)";
+                VersionTextBlock.Text = $"Version: {version}";
+            }
+            catch (Exception ex)
+            {
+                VersionTextBlock.Text = "Version: (error)";
+            }
+        }
+
+        private async void OnOpenAppInstaller(object sender, RoutedEventArgs e)
+        {
+            // Validate the configured AppInstallerFileUrl before attempting to launch App Installer.
+            // App Installer requires a direct HTTPS URL to a .appinstaller file (or a local file URI).
+            try
+            {
+                if (string.IsNullOrWhiteSpace(AppInstallerFileUrl))
+                {
+                    var dlg = new ContentDialog() { Title = "AppInstaller", Content = "Chưa cấu hình AppInstaller URL.", CloseButtonText = "OK" };
+                    await dlg.ShowAsync();
+                    return;
+                }
+
+                // Quick validation: prefer HTTPS and direct .appinstaller link
+                if (!AppInstallerFileUrl.StartsWith("https://", StringComparison.OrdinalIgnoreCase)
+                    || !AppInstallerFileUrl.TrimEnd('/').EndsWith(".appinstaller", StringComparison.OrdinalIgnoreCase))
+                {
+                    // If it's a Google Drive share link or another indirect link, inform the user.
+                    var msg = "App Installer yêu cầu một đường dẫn trực tiếp tới file .appinstaller (HTTPS).\n" +
+                              "Ví dụ: https://example.com/YourApp.appinstaller\n" +
+                              "Hiện tại URL của bạn có thể là link chia sẻ (Google Drive) hoặc không trỏ trực tiếp tới file.\n" +
+                              "Bạn có thể mở URL trong trình duyệt để tải xuống hoặc cập nhật AppInstallerFileUrl.";
+
+                    var dlg = new ContentDialog()
+                    {
+                        Title = "Invalid AppInstaller URL",
+                        Content = msg,
+                        PrimaryButtonText = "Mở URL",
+                        CloseButtonText = "Đóng"
+                    };
+
+                    var res = await dlg.ShowAsync();
+                    if (res == ContentDialogResult.Primary)
+                    {
+                        // Open the URL in browser so the user can inspect/download it
+                        var webUri = new Uri(AppInstallerFileUrl);
+                        await Windows.System.Launcher.LaunchUriAsync(webUri);
+                    }
+
+                    return;
+                }
+
+                // Try to launch installer; if that fails, fallback to downloading the .appinstaller locally and launching from file URI
+                var success = await LaunchInstallerWithFallbackAsync(AppInstallerFileUrl);
+                if (!success)
+                {
+                    var dlg2 = new ContentDialog() { Title = "AppInstaller", Content = "Không thể mở App Installer (Launcher trả về false).", CloseButtonText = "OK" };
+                    await dlg2.ShowAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                var dlg = new ContentDialog() { Title = "AppInstaller", Content = $"Lỗi khi mở App Installer: {ex.Message}", CloseButtonText = "OK" };
+                await dlg.ShowAsync();
+            }
+        }
+
+        private async Task CheckForUpdatesAsync()
+        {
+            try
+            {
+                // Download the .appinstaller file
+                var resp = await s_httpClient.GetAsync(AppInstallerFileUrl);
+                if (!resp.IsSuccessStatusCode)
+                    return;
+
+                var xml = await resp.Content.ReadAsStringAsync();
+                var doc = XDocument.Parse(xml);
+
+                // Namespace used by appinstaller files
+                XNamespace ns = "http://schemas.microsoft.com/appx/appinstaller/2017/2";
+
+                // Try to find MainPackage element
+                var mainPackage = doc.Root?.Element(ns + "MainPackage");
+                if (mainPackage == null)
+                {
+                    // fallback: try without namespace
+                    mainPackage = doc.Root?.Element("MainPackage");
+                }
+
+                var remoteVersionStr = mainPackage?.Attribute("Version")?.Value;
+                if (string.IsNullOrEmpty(remoteVersionStr))
+                    return;
+
+                if (!Version.TryParse(remoteVersionStr, out var remoteVersion))
+                    return;
+
+                var localVersionStr = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "1.0.0";
+                if (!Version.TryParse(localVersionStr, out var localVersion))
+                    return;
+
+                if (remoteVersion > localVersion)
+                {
+                    // Prompt user for update on UI thread
+                    DispatcherQueue.TryEnqueue(() => { _ = ShowUpdateDialogAndLaunchAsync(remoteVersion, localVersion); });
+                }
+            }
+            catch
+            {
+                // Swallow errors - update check should not crash the app
+            }
+        }
+
+        private async Task ShowUpdateDialogAndLaunchAsync(Version remoteVersion, Version localVersion)
+        {
+            var dlg = new ContentDialog()
+            {
+                Title = "Cập nhật có sẵn",
+                Content = $"Phiên bản {remoteVersion} có sẵn (hiện tại {localVersion}). Bạn có muốn cập nhật ngay không?",
+                PrimaryButtonText = "Cập nhật",
+                CloseButtonText = "Hủy"
+            };
+
+            var result = await dlg.ShowAsync();
+            if (result == ContentDialogResult.Primary)
+            {
+                // Launch App Installer to perform update
+                // Try to launch installer; if that fails, fallback to downloading the .appinstaller locally and launching from file URI
+                await LaunchInstallerWithFallbackAsync(AppInstallerFileUrl);
+            }
+        }
+
+        // Attempts to launch the App Installer using the provided source URL. If launching the remote
+        // ms-appinstaller URI fails, this method downloads the .appinstaller file to a temporary local
+        // file and retries using a file:// URI.
+        private async Task<bool> LaunchInstallerWithFallbackAsync(string sourceUrl)
+        {
+            try
+            {
+                var encodedSource = Uri.EscapeDataString(sourceUrl);
+                var installerUri = new Uri($"ms-appinstaller:?source={encodedSource}");
+                var success = await Windows.System.Launcher.LaunchUriAsync(installerUri);
+                if (success)
+                    return true;
+            }
+            catch
+            {
+                // ignore and try fallback
+            }
+
+            // Fallback: download the .appinstaller to a temp file and launch using a file URI
+            try
+            {
+                var resp = await s_httpClient.GetAsync(sourceUrl);
+                if (!resp.IsSuccessStatusCode)
+                    return false;
+
+                var bytes = await resp.Content.ReadAsByteArrayAsync();
+                var tempPath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString() + ".appinstaller");
+                await File.WriteAllBytesAsync(tempPath, bytes);
+
+                var fileUri = new Uri(tempPath).AbsoluteUri; // file:///C:/... form
+                var installerUri2 = new Uri($"ms-appinstaller:?source={fileUri}");
+                var success2 = await Windows.System.Launcher.LaunchUriAsync(installerUri2);
+                return success2;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+    }
+}

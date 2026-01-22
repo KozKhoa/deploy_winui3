@@ -1,12 +1,7 @@
 {
   "Version": 1,
-  "WorkspaceRootPath": "C:\\Users\\topki\\Documents\\Code\\Deploy_WinUI3\\",
-  "Documents": [
-    {
-      "AbsoluteMoniker": "D:0:0:{BCAF0A83-413C-40BF-9B1B-FC31BBAB9FA5}|Deploy_WinUI3\\Deploy_WinUI3\\Deploy_WinUI3.csproj|c:\\users\\topki\\documents\\code\\deploy_winui3\\deploy_winui3\\deploy_winui3\\mainwindow.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
-      "RelativeMoniker": "D:0:0:{BCAF0A83-413C-40BF-9B1B-FC31BBAB9FA5}|Deploy_WinUI3\\Deploy_WinUI3\\Deploy_WinUI3.csproj|solutionrelative:deploy_winui3\\deploy_winui3\\mainwindow.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
-    }
-  ],
+  "WorkspaceRootPath": "C:\\Users\\topki\\OneDrive\\Desktop\\deploy_winui3\\",
+  "Documents": [],
   "DocumentGroupContainers": [
     {
       "Orientation": 0,
@@ -14,24 +9,11 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 1,
+          "SelectedChildIndex": -1,
           "Children": [
             {
               "$type": "Bookmark",
               "Name": "ST:0:0:{1c4feeaa-4718-4aa9-859d-94ce25d182ba}"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "MainWindow.xaml",
-              "DocumentMoniker": "C:\\Users\\topki\\Documents\\Code\\Deploy_WinUI3\\Deploy_WinUI3\\Deploy_WinUI3\\MainWindow.xaml",
-              "RelativeDocumentMoniker": "Deploy_WinUI3\\Deploy_WinUI3\\MainWindow.xaml",
-              "ToolTip": "C:\\Users\\topki\\Documents\\Code\\Deploy_WinUI3\\Deploy_WinUI3\\Deploy_WinUI3\\MainWindow.xaml",
-              "RelativeToolTip": "Deploy_WinUI3\\Deploy_WinUI3\\MainWindow.xaml",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAmAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
-              "WhenOpened": "2026-01-22T10:20:03.014Z",
-              "EditorCaption": ""
             }
           ]
         }
